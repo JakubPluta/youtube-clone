@@ -2,9 +2,23 @@
 import React from "react";
 import { Grid } from '@material-ui/core'
 import youtube from "./api/youtube";
-import {VideoDetail, VideoList, SearchBar} from './components';
+import {VideoDetail, VideoList, SearchBar, VideoItem} from './components';
 
 class App extends React.Component {
+    state = {
+        videos: [],
+        selectedVideo: null,
+
+    }
+
+    componentDidMount(){
+        this.handleSubmit('Tornado of Souls');
+    }
+
+    onVideoSelect = (video) => {
+        this.setState({selectedVideo: video})
+    }
+
     handleSubmit = async (searchTerm) => {
         const response = await youtube.get('search', {
         params: {
@@ -18,12 +32,11 @@ class App extends React.Component {
         
         
         )
-        
-        
         ;
-        console.log(response.data)
+        this.setState({videos: response.data.items, selectedVideo: response.data.items[0]})
     }
 render () {
+    const {selectedVideo, videos} = this.state;
     return (
     <Grid justifyContent='center' container spacing={10}> 
         <Grid item xs={12}>
@@ -33,11 +46,11 @@ render () {
                 </Grid>
 
                 <Grid item xs={8}>
-                <VideoDetail/>
+                <VideoDetail video={selectedVideo}/>
                 </Grid>
 
                 <Grid item xs={4}>
-                    {/* {Video List} */}
+                    <VideoList videos={videos} onVideoSelect={this.onVideoSelect}/>
                 </Grid>
             </Grid>
         </Grid>
@@ -48,10 +61,5 @@ render () {
 }
 
 
-
-
-// const App = () => {
-//     return <h1>Youtube clone</h1>
-// }
 
 export default App;
